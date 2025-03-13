@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:14.6
+    container_name: neetcode-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neetcodedb
+    volumes:
+      - neetcode_custom_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - neetcode-network
+
+  # Node.js Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neetcode-api
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neetcodedb
+      POSTGRES_HOST: db
+      PORT: 3000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - neetcode-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: neetcode-frontend
+    restart: always
+    ports:
+      - "8008:80"
+    depends_on:
+      - api
+    networks:
+      - neetcode-network
+
+volumes:
+  neetcode_custom_data:
+
+networks:
+  neetcode-network:
+    driver: bridge
