@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Custom NeetCode</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --background-color: #f4f4f4;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --completed-color: #c8e6c9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .search-bar {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            width: 250px;
+        }
+
+        .main-content {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-right: 20px;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar h2 button {
+            font-size: 1.2rem;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .category-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .category-list li {
+            padding: 10px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-list li:hover {
+            color: var(--primary-color);
+        }
+
+        .category-list li .delete-icon {
+            visibility: hidden;
+            color: #f44336;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .category-list li:hover .delete-icon {
+            visibility: visible;
+        }
+
+        .active-category {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .problem-container {
+            flex: 1;
+            background-color: var(--card-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .problem-header h2 {
+            margin: 0;
+        }
+
+        .filter-options select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .problem-card {
+            background-color: var(--card-color);
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .problem-card.completed {
+            background-color: var(--completed-color);
+        }
+
+        .problem-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .problem-difficulty {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .easy {
+            background-color: #4CAF50;
+        }
+
+        .medium {
+            background-color: #FF9800;
+        }
+
+        .hard {
+            background-color: #F44336;
+        }
+
+        .problem-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .delete-problem {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #f44336;
+            font-size: 1rem;
+            cursor: pointer;
+            visibility: hidden;
+        }
+
+        .problem-card:hover .delete-problem {
+            visibility: visible;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            margin: 10% auto;
+            padding: 20px;
+            width: 50%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-button {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .modal-form div {
+            margin-bottom: 15px;
+        }
+
+        .modal-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .modal-form input, .modal-form select, .modal-form textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-form textarea {
+            height: 100px;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .reset-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .reset-button:hover {
+            background-color: #d32f2f;
+        }
+
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 2001;
+            left: 50%;
+            bottom: 30px;
+        }
+
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .problem-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="toast" class="toast">Message</div>
+
+    <header>
+        <div class="container">
+            <h1>My Custom NeetCode</h1>
+            <input type="text" class="search-bar" placeholder="Search problems..." id="search-input">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value" id="total-problems">0</div>
+                <div class="stat-label">Total Problems</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="completed-problems">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="completion-percentage">0%</div>
+                <div class="stat-label">Completion Rate</div>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+                <button class="reset-button" id="reset-progress">Reset Progress</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>
+                    Categories
+                    <button id="add-category-button">+</button>
+                </h2>
+                <ul class="category-list" id="category-list">
+                    <li class="active-category" data-category="all">All Problems</li>
+                    <!-- Categories will be loaded dynamically -->
+                </ul>
+            </div>
+
+            <div class="problem-container">
+                <div class="problem-header">
+                    <h2 id="current-category">All Problems</h2>
+                    <div class="filter-options">
+                        <select id="difficulty-filter">
+                            <option value="all">All Difficulties</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="problem-grid" id="problem-grid">
+                    <!-- Problem cards will be dynamically populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-button" id="add-problem-button">+</div>
+
+    <!-- Problem Modal -->
+    <div class="modal" id="problem-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" id="close-modal">&times;</span>
+                <h2>Add New Problem</h2>
+            </div>
+            <div class="modal-form">
+                <div>
+                    <label for="problem-name">Problem Name</label>
+                    <input type="text" id="problem-name" required>
+                </div>
+                <div>
+                    <label for="problem-url">LeetCode URL</label>
+                    <input type="url" id="problem-url" placeholder="https://leetcode.com/problems/...">
+                </div>
+                <div>
+                    <label for="problem-difficulty">Difficulty</label>
+                    <select id="problem-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="problem-category">Category</label>
+                    <select id="problem-category">
+                        <!-- Categories will be loaded dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label for="problem-notes">Notes (optional)</label>
+                    <textarea id="problem-notes" placeholder="Add your notes, solution approach, or tips here..."></textarea>
+                </div>
+                <button class="button" id="save-problem">Save Problem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal" id="category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" id="close-category-modal">&times;</span>
+                <h2>Add New Category</h2>
+            </div>
+            <div class="modal-form">
+                <div>
+                    <label for="category-name">Category Name</label>
+                    <input type="text" id="category-name" required>
+                </div>
+                <button class="button" id="save-category">Save Category</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API URL
+            const API_URL = 'http://localhost:3000/api';
+
+            // DOM elements
+            const categoryList = document.getElementById('category-list');
+            const problemGrid = document.getElementById('problem-grid');
+            const currentCategory = document.getElementById('current-category');
+            const difficultyFilter = document.getElementById('difficulty-filter');
+            const addProblemButton = document.getElementById('add-problem-button');
+            const problemModal = document.getElementById('problem-modal');
+            const closeModal = document.getElementById('close-modal');
+            const saveButton = document.getElementById('save-problem');
+            const searchBar = document.getElementById('search-input');
+            const totalProblemsElement = document.getElementById('total-problems');
+            const completedProblemsElement = document.getElementById('completed-problems');
+            const completionPercentageElement = document.getElementById('completion-percentage');
+            const progressBar = document.getElementById('progress-bar');
+            const resetProgressButton = document.getElementById('reset-progress');
+            const loader = document.getElementById('loader');
+            const addCategoryButton = document.getElementById('add-category-button');
+            const categoryModal = document.getElementById('category-modal');
+            const closeCategoryModal = document.getElementById('close-category-modal');
+            const saveCategoryButton = document.getElementById('save-category');
+            const problemCategorySelect = document.getElementById('problem-category');
+            const toast = document.getElementById('toast');
+
+            // Current filter state
+            let currentCategoryFilter = 'all';
+            let currentCategoryId = null;
+            let currentDifficultyFilter = 'all';
+            let searchQuery = '';
+            let categories = [];
+            let problems = [];
+
+            // Show/hide loader
+            function showLoader() {
+                loader.style.display = 'flex';
+            }
+
+            function hideLoader() {
+                loader.style.display = 'none';
+            }
+
+            // Show toast message
+            function showToast(message) {
+                toast.textContent = message;
+                toast.className = 'toast show';
+                setTimeout(() => {
+                    toast.className = toast.className.replace('show', '');
+                }, 3000);
+            }
+
+            // Fetch categories from API
+            async function fetchCategories() {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/categories`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch categories');
+                    }
+                    categories = await response.json();
+                    renderCategories();
+                    populateCategoryDropdown();
+                } catch (error) {
+                    console.error('Error fetching categories:', error);
+                    showToast('Error loading categories');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Fetch problems from API
+            async function fetchProblems() {
+                showLoader();
+                try {
+                    let url = `${API_URL}/problems`;
+                    if (currentCategoryId) {
+                        url = `${API_URL}/categories/${currentCategoryId}/problems`;
+                    }
+                    
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch problems');
+                    }
+                    problems = await response.json();
+                    renderProblems();
+                    updateStats();
+                } catch (error) {
+                    console.error('Error fetching problems:', error);
+                    showToast('Error loading problems');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Render categories in sidebar
+            function renderCategories() {
+                // Keep "All Problems" as the first item
+                const allProblemsItem = categoryList.querySelector('li[data-category="all"]');
+                categoryList.innerHTML = '';
+                categoryList.appendChild(allProblemsItem);
+
+                // Add categories from API
+                categories.forEach(category => {
+                    const li = document.createElement('li');
+                    li.dataset.category = category.name.toLowerCase().replace(/\s+/g, '-');
+                    li.dataset.id = category.id;
+                    li.innerHTML = `
+                        ${category.name}
+                        <span class="delete-icon" data-id="${category.id}">&times;</span>
+                    `;
+                    categoryList.appendChild(li);
+                });
+
+                // Add event listeners to delete icons
+                document.querySelectorAll('.delete-icon').forEach(icon => {
+                    icon.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const categoryId = e.target.dataset.id;
+                        if (confirm('Are you sure you want to delete this category? All associated problems will also be deleted.')) {
+                            await deleteCategory(categoryId);
+                        }
+                    });
+                });
+            }
+
+            // Populate category dropdown in problem modal
+            function populateCategoryDropdown() {
+                problemCategorySelect.innerHTML = '';
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    problemCategorySelect.appendChild(option);
+                });
+            }
+
+            // Render problems based on filters
+            function renderProblems() {
+                problemGrid.innerHTML = '';
+
+                const filteredProblems = problems.filter(problem => {
+                    const difficultyMatch = currentDifficultyFilter === 'all' || problem.difficulty === currentDifficultyFilter;
+                    const searchMatch = searchQuery === '' || 
+                        problem.name.toLowerCase().includes(searchQuery.toLowerCase());
+                    return difficultyMatch && searchMatch;
+                });
+
+                filteredProblems.forEach(problem => {
+                    const card = document.createElement('div');
+                    card.className = `problem-card ${problem.completed ? 'completed' : ''}`;
+                    card.dataset.id = problem.id;
+                    
+                    card.innerHTML = `
+                        <div class="problem-title">${problem.name}</div>
+                        <div class="problem-difficulty ${problem.difficulty}">${problem.difficulty}</div>
+                        <div class="problem-stats">
+                            <span>${problem.category_name || ''}</span>
+                            <span class="problem-status">${problem.completed ? 'Completed' : 'Not Started'}</span>
+                        </div>
+                        <span class="delete-problem" data-id="${problem.id}">&times;</span>
+                    `;
+
+                    const problemTitle = card.querySelector('.problem-title');
+                    problemTitle.addEventListener('click', () => {
+                        if (problem.url) {
+                            window.open(problem.url, '_blank');
+                        }
+                    });
+
+                    card.addEventListener('contextmenu', async (e) => {
+                        e.preventDefault();
+                        await updateProblemCompletion(problem.id, !problem.completed);
+                    });
+
+                    const deleteIcon = card.querySelector('.delete-problem');
+                    deleteIcon.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm('Are you sure you want to delete this problem?')) {
+                            await deleteProblem(problem.id);
+                        }
+                    });
+
+                    problemGrid.appendChild(card);
+                });
+            }
+
+            // Update stats
+            function updateStats() {
+                const totalProblems = problems.length;
+                const completedProblems = problems.filter(problem => problem.completed).length;
+                const completionPercentage = totalProblems > 0 ? Math.round((completedProblems / totalProblems) * 100) : 0;
+
+                totalProblemsElement.textContent = totalProblems;
+                completedProblemsElement.textContent = completedProblems;
+                completionPercentageElement.textContent = `${completionPercentage}%`;
+                progressBar.style.width = `${completionPercentage}%`;
+            }
+
+            // Create a new category
+            async function createCategory(name) {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/categories`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to create category');
+                    }
+                    
+                    await fetchCategories();
+                    showToast('Category created successfully');
+                } catch (error) {
+                    console.error('Error creating category:', error);
+                    showToast(error.message || 'Error creating category');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Delete a category
+            async function deleteCategory(id) {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/categories/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to delete category');
+                    }
+                    
+                    // Reset to all problems if the current category was deleted
+                    if (currentCategoryId === id) {
+                        setActiveCategory(document.querySelector('li[data-category="all"]'));
+                    }
+                    
+                    await fetchCategories();
+                    await fetchProblems();
+                    showToast('Category deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                    showToast(error.message || 'Error deleting category');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Create a new problem
+            async function createProblem(problemData) {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/problems`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(problemData)
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to create problem');
+                    }
+                    
+                    await fetchProblems();
+                    showToast('Problem created successfully');
+                } catch (error) {
+                    console.error('Error creating problem:', error);
+                    showToast(error.message || 'Error creating problem');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Delete a problem
+            async function deleteProblem(id) {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/problems/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to delete problem');
+                    }
+                    
+                    await fetchProblems();
+                    showToast('Problem deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting problem:', error);
+                    showToast(error.message || 'Error deleting problem');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Update problem completion status
+            async function updateProblemCompletion(id, completed) {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/problems/${id}/completion`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ completed })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to update problem status');
+                    }
+                    
+                    await fetchProblems();
+                    showToast(`Problem marked as ${completed ? 'completed' : 'not completed'}`);
+                } catch (error) {
+                    console.error('Error updating problem status:', error);
+                    showToast(error.message || 'Error updating problem status');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Reset all progress
+            async function resetProgress() {
+                showLoader();
+                try {
+                    const response = await fetch(`${API_URL}/problems/reset-progress`, {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to reset progress');
+                    }
+                    
+                    await fetchProblems();
+                    showToast('Progress reset successfully');
+                } catch (error) {
+                    console.error('Error resetting progress:', error);
+                    showToast(error.message || 'Error resetting progress');
+                } finally {
+                    hideLoader();
+                }
+            }
+
+            // Set active category
+            function setActiveCategory(element) {
+                // Remove active class from current active
+                const currentActive = document.querySelector('.active-category');
+                if (currentActive) {
+                    currentActive.classList.remove('active-category');
+                }
+                
+                // Add active class to new active
+                element.classList.add('active-category');
+                
+                // Update filters and title
+                currentCategoryFilter = element.dataset.category;
+                currentCategoryId = element.dataset.id || null;
+                currentCategory.textContent = element.textContent.trim();
+                
+                // Fetch problems for this category
+                fetchProblems();
+            }
+
+            // Event listeners
+
+            // Category selection
+            categoryList.addEventListener('click', (e) => {
+                if (e.target.tagName === 'LI') {
+                    setActiveCategory(e.target);
+                }
+            });
+
+            // Difficulty filter
+            difficultyFilter.addEventListener('change', () => {
+                currentDifficultyFilter = difficultyFilter.value;
+                renderProblems();
+            });
+
+            // Search
+            searchBar.addEventListener('input', () => {
+                searchQuery = searchBar.value;
+                renderProblems();
+            });
+
+            // Problem modal
+            addProblemButton.addEventListener('click', () => {
+                console.log("Add problem button clicked");
+                problemModal.style.display = 'block';
+            });
+
+            closeModal.addEventListener('click', () => {
+                problemModal.style.display = 'none';
+            });
+
+            // Category modal
+            addCategoryButton.addEventListener('click', () => {
+                console.log("Add category button clicked");
+                categoryModal.style.display = 'block';
+            });
+
+            closeCategoryModal.addEventListener('click', () => {
+                categoryModal.style.display = 'none';
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === problemModal) {
+                    problemModal.style.display = 'none';
+                }
+                if (e.target === categoryModal) {
+                    categoryModal.style.display = 'none';
+                }
+            });
+
+            // Save problem
+            saveButton.addEventListener('click', async () => {
+                const problemName = document.getElementById('problem-name').value;
+                const problemUrl = document.getElementById('problem-url').value;
+                const problemDifficulty = document.getElementById('problem-difficulty').value;
+                const problemCategoryId = document.getElementById('problem-category').value;
+                const problemNotes = document.getElementById('problem-notes').value;
+
+                if (problemName && problemCategoryId) {
+                    const problemData = {
+                        name: problemName,
+                        url: problemUrl,
+                        difficulty: problemDifficulty,
+                        category_id: problemCategoryId,
+                        notes: problemNotes
+                    };
+
+                    await createProblem(problemData);
+                    
+                    // Reset form and close modal
+                    document.getElementById('problem-name').value = '';
+                    document.getElementById('problem-url').value = '';
+                    document.getElementById('problem-notes').value = '';
+                    problemModal.style.display = 'none';
+                } else {
+                    showToast('Problem name and category are required');
+                }
+            });
+
+            // Save category
+            saveCategoryButton.addEventListener('click', async () => {
+                const categoryName = document.getElementById('category-name').value;
+                
+                if (categoryName) {
+                    await createCategory(categoryName);
+                    
+                    // Reset form and close modal
+                    document.getElementById('category-name').value = '';
+                    categoryModal.style.display = 'none';
+                } else {
+                    showToast('Category name is required');
+                }
+            });
+
+            // Reset progress
+            resetProgressButton.addEventListener('click', async () => {
+                if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                    await resetProgress();
+                }
+            });
+
+            // Initialize application
+            async function initApp() {
+                await fetchCategories();
+                await fetchProblems();
+            }
+
+            // Start the application
+            initApp();
+        });
+    </script>
+</body>
+</html>
